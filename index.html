@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    	<title>Latihan Crud Vue JS & PHP</title>
+	<link
+	    href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+	    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+	    crossorigin="anonymous"/>
+    </head>
+    <body>
+        <div class="container mt-2" id="crudApp">
+            <h2 class="alert alert-success text-center">
+                Latihan CRUD dengan menggunakan Vue Js dan MySQL
+            </h2>
+            <div class="card">
+                <div class="card-header">
+                    <!-- button modal untuk add user -->
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalTambah">Tambah Data</button>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-crud d-none"></div>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr class="bg-dark text-white">
+                                <th>No</th>
+                                <th>Nama Depan</th>
+                                <th>Nama Belakang</th>
+                                <th>Edit</th>
+                                <th>Hapus</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(item, index) in allData" :key="index">
+                                <td>{{ index+1 }}</td>
+                                <td>{{ item.first_name }}</td>
+                                <td>{{ item.last_name }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalEdit"
+                                    @click="editData(item.id, item.first_name, item.last_name)">Edit</button>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalDelete"
+                                    @click="showData(item.id)">Hapus</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- dibawah ini adalah modal tambah -->
+            <div class="modal fade" id="modalTambah" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Form Tambah</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                        <div class="modal-body">
+                        <div class="form-group mb-2">
+                        <label for="">Nama Depan</label>
+                        <input type="text" class="form-control" v-model="first_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="">Nama Belakang</label>
+                        <input type="text" class="form-control" v-model="last_name" required>
+                    </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button class="btn btn-primary" @click="simpanData">Kirim</button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- dibawah ini adalah modal edit -->
+            <div class="modal fade" id="modalEdit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Form Edit</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                        <div class="modal-body">
+                            <input type="hidden" id="id" v-model="id">
+                            <div class="form-group mb-2">
+                                <label for="">Nama Depan</label>
+                                <input type="text" class="form-control" v-model="first_name">
+                            </div>
+                            <div class="form-group">
+                                <label for="">Nama Belakang</label>
+                                <input type="text" class="form-control" v-model="last_name">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button class="btn btn-primary" @click="updateData">Kirim</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- dibawah ini adalah modal delete -->
+            <div class="modal fade" id="modalDelete" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Form Hapus</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                        <div class="modal-body">
+                            <input type="hidden" id="id" v-model="id">
+                            Anda yakin ingin menghapus data ini?
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                          <button class="btn btn-primary" @click="deleteData">Ya</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+                integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script>
+            //inisiasi vue
+            var app = new Vue({
+                el:"#crudApp",
+                data: {
+                    allData: "",
+                    first_name: "",
+                    last_name: "",
+                    id:""
+                },
+                methods: {
+                    //metode untuk menampilkan data
+                    fetchAllData: function() {
+                        axios
+                            .post("action.php", {
+                                action: "fetchall",
+                            })
+                            .then(function(response) {
+                                // respon adalah data yang berhasil diambil dari database
+                                // respon.data adalah data yang dimasukan ke dalam variabel allData
+                                // allData akan dilooping di tabel nantinya
+                                app.allData = response.data;
+                            });
+                    },
+                    //metode untuk insert data
+                    simpanData: function(){
+                        if(app.first_name == '' || app.last_name == ''){
+                            alert('isi semua data terlebih dahulu!');
+                        }else{                
+                            axios
+                            .post("action.php", {
+                                action: "insert",
+                                first_name: app.first_name,
+                                last_name: app.last_name
+                            })
+                            .then(function (response){
+                                //memperbarui data
+                                app.fetchAllData()
+                                //menutup modal
+                                $("#modalTambah").modal("hide"); 
+                                //show alert
+                                $(".alert-crud").removeClass("d-none").addClass("alert-success").html('Data berhasil ditambahkan');
+                                //mengosongkan isi form
+                                app.first_name = ''
+                                app.last_name = ''
+                            });
+                        }
+                    },
+                    //isi form saat modal edit tampil
+                    editData: function(id, first_name, last_name){
+
+                        //isi input id 
+                        app.id = id
+
+                        //isi input nama depan
+                        app.first_name = first_name
+
+                        //isi input nama belakang
+                        app.last_name = last_name
+                    },
+                    //metode untuk update data
+                    updateData: function(){
+                        if(app.id == '' || app.first_name == '' || app.last_name == ''){
+                            alert('isi semua data terlebih dahulu!');
+                        }else{                
+                            axios
+                                .post("action.php", {
+                                    action: "update",
+                                    id: app.id,
+                                    first_name: app.first_name,
+                                    last_name: app.last_name
+                                })
+                                .then(function (response){
+
+                                    //memperbarui data
+                                    app.fetchAllData()
+
+                                    //menutup modal
+                                    $("#modalEdit").modal("hide"); 
+                                    //show alert
+                                    $(".alert-crud").removeClass("d-none").addClass("alert-success").html('Data berhasil diperbaharui');
+                                    //mengosongkan isi form
+                                    app.id          = ''
+                                    app.first_name  = ''
+                                    app.last_name   = ''
+                                });
+                        }
+                    },
+                    showData: function(id) {
+                        //isi input id
+                        app.id = id
+
+                    },
+                    //metode untuk delete data
+                    deleteData: function(){
+                        if(app.id == ''){
+                            alert('data yg dipilih tidak ada!');
+                        }else{                
+                            axios
+                                .post("action.php", {
+                                    action: "delete",
+                                    id: app.id,
+                                })
+                                .then(function (response){
+                                    //memperbarui data
+                                    app.fetchAllData()
+
+                                    //menutup modal
+                                    $("#modalDelete").modal("hide"); 
+                                    //show alert
+                                    $(".alert-crud").removeClass("d-none").addClass("alert-success").html('Data berhasil dihapus');
+                                    //mengosongkan isi form
+                                    app.id          = ''
+                                    app.first_name  = ''
+                                    app.last_name   = ''
+                                });
+                        }
+                    },
+                },
+                // semua yang ada di dalam creadted akan dijalankan saat pertama kali document dimuat 
+                created:function() {
+                    this.fetchAllData();
+                }
+            })
+        </script>
+    </body>
+</html>
